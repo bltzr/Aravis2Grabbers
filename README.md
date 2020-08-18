@@ -1,5 +1,5 @@
-This openFrameworks application allows to send images from 2 Aravis cameras (tested with FLIR gigE cameras)/
-There is also a simple BRCOSA shader for basic image correction, and display parameters are accessible via OSC (NB: 
+This openFrameworks application allows to send images from 2 Aravis cameras (tested with FLIR gigE cameras).
+There is also a simple BRCOSA shader for basic image correction, and display parameters are accessible via OSC (i.e. with the attached Max patcher).
 
 # Installation:
 Some externals ofAddons are necessary:
