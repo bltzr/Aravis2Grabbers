@@ -1,0 +1,4 @@
+ofxAravis
+ofxOpenCv
+ofxOsc
+ofxSyphon
