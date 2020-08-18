@@ -6,7 +6,9 @@ Some externals ofAddons are necessary:
 - https://github.com/bltzr/ofxAravis.git
 - https://github.com/astellato/ofxSyphon.git 
 
-You might need to add a Code Signing Identity in the XCode project’s Build Settings, and add a `--deep` flag in Other Code Signing Flags
+This works with of 0.9.8. Not tested with versions above, but *should* work.
+
+in of versions < 0.10, you might need to add a Code Signing Identity in the XCode project’s Build Settings, and add a `--deep` flag in Other Code Signing Flags
 
 And… it should be OK. Please let me know in the issues if it doesn’t, after looking at the notes below.
 
