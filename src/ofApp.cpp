@@ -24,12 +24,12 @@ void ofApp::setup(){
     
     BCSA.load("bcsa");
     
-    fbo1.allocate(ofGetWidth()/2, ofGetHeight(), GL_RGB);
+    fbo1.allocate(camWidth, camHeight, GL_RGB);
     fbo1.begin();
     ofClear(0,0,0);
     fbo1.end();
 
-    fbo2.allocate(ofGetWidth()/2, ofGetHeight(), GL_RGB);
+    fbo2.allocate(camWidth, camHeight, GL_RGB);
     fbo2.begin();
     ofClear(0,0,0);
     fbo2.end();
@@ -40,23 +40,10 @@ void ofApp::setup(){
     receiver.setup(PORTIN);
 
     //we can now get back a list of devices.
-    getDevices();
+    //getDevices();
     
     //turn off displays
     displayOI = 0;
-
-    //set default devices
-    /*
-    vidGrabber1.setDeviceID(2);
-    vidGrabber1.setDesiredFrameRate(15);
-    vidGrabber1.setPixelFormat(OF_PIXELS_NATIVE);
-    vidGrabber1.setup(camWidth, camHeight);
-    
-    vidGrabber2.setDeviceID(0);
-    vidGrabber2.setDesiredFrameRate(15);
-    vidGrabber2.setPixelFormat(OF_PIXELS_NATIVE);
-    vidGrabber2.setup(camWidth, camHeight);
-     */
 
     videoTexture1.allocate(camWidth,camHeight,GL_RGBA);
     videoTexture2.allocate(camWidth,camHeight,GL_RGBA);
@@ -131,6 +118,30 @@ void ofApp::update(){
             //ofLog() << "t" << m.getArgAsInt32(0);
             anchorY2 = m.getArgAsFloat(0);
         }
+        else if(m.getAddress() == "/cam1/fold/anchor/x"){
+            //ofLog() << "zoomX1" << m.getArgAsFloat(0);
+            FanchorX1 = m.getArgAsFloat(0);
+        }
+        else if(m.getAddress() == "/cam2/fold/anchor/x"){
+            //ofLog() << "t" << m.getArgAsInt32(0);
+            FanchorX2 = m.getArgAsFloat(0);
+        }
+        else if(m.getAddress() == "/cam1/fold/anchor/y"){
+            //ofLog() << "zoomX1" << m.getArgAsFloat(0);
+            FanchorY1 = m.getArgAsFloat(0);
+        }
+        else if(m.getAddress() == "/cam2/fold/anchor/y"){
+            //ofLog() << "t" << m.getArgAsInt32(0);
+            FanchorY2 = m.getArgAsFloat(0);
+        }
+        else if(m.getAddress() == "/cam1/fold/radius"){
+            //ofLog() << "zoomX1" << m.getArgAsFloat(0);
+            Fradius1 = m.getArgAsFloat(0);
+        }
+        else if(m.getAddress() == "/cam2/fold/radius"){
+            //ofLog() << "t" << m.getArgAsInt32(0);
+            Fradius2 = m.getArgAsFloat(0);
+        }
         //BRCOSA
         else if(m.getAddress() == "/cam1/brightness"){
             //ofLog() << "zoomX1" << m.getArgAsFloat(0);
@@ -160,10 +171,12 @@ void ofApp::update(){
 
     if(vidGrabber1.isFrameNew()){
         videoTexture1 = vidGrabber1.getTexture();
-        SyCam1.publishTexture(&videoTexture1);
         fbo1.begin();
         ofClear(0,0,0);
         BCSA.begin();
+        BCSA.setUniform2f("dim", camWidth, camHeight);
+        BCSA.setUniform2f("anchor", FanchorX1, FanchorY1);
+        BCSA.setUniform1f("radius", Fradius1);
         BCSA.setUniform3f("avgluma",0.62,0.62,0.62);
         BCSA.setUniform1f("brightness", BR1);
         BCSA.setUniform1f("contrast", CO1);
@@ -174,14 +187,17 @@ void ofApp::update(){
         videoTexture1.draw(fbo1.getWidth()/2,fbo1.getHeight()/2,videoTexture1.getWidth()*zoomX1, videoTexture1.getHeight()*zoomY1);
         BCSA.end();
         fbo1.end();
+        SyCam1.publishTexture(&fbo1.getTexture());
     }
     
     if(vidGrabber2.isFrameNew()){
         videoTexture2 = vidGrabber2.getTexture();
-        SyCam2.publishTexture(&videoTexture2);
         fbo2.begin();
         ofClear(0,0,0);
         BCSA.begin();
+        BCSA.setUniform2f("dim", camWidth, camHeight);
+        BCSA.setUniform2f("anchor", FanchorX2, FanchorY2);
+        BCSA.setUniform1f("radius", Fradius2);
         BCSA.setUniform3f("avgluma",0.62,0.62,0.62);
         BCSA.setUniform1f("brightness", BR2);
         BCSA.setUniform1f("contrast", CO2);
@@ -192,6 +208,8 @@ void ofApp::update(){
         videoTexture2.draw(fbo2.getWidth()/2,fbo2.getHeight()/2,videoTexture2.getWidth()*zoomX2,videoTexture2.getHeight()*zoomY2);
         BCSA.end();
         fbo2.end();
+        SyCam2.publishTexture(&fbo2.getTexture());
+        
     }
 }
 
@@ -199,9 +217,8 @@ void ofApp::update(){
 void ofApp::draw(){
     if (displayOI){
         ofSetHexColor(0xffffff);
-        fbo1.draw(0, 0, ofGetWidth()/2, ofGetHeight());
-        fbo2.draw(ofGetWidth()/2, 0, ofGetWidth(), ofGetHeight());
-        // videoTexture.draw(20 + camWidth, 20, camWidth, camHeight);
+        fbo1.draw(ofGetWidth()/4, 0, ofGetWidth()/2, ofGetHeight()/2);
+        fbo2.draw(ofGetWidth()/4, ofGetWidth()/2, ofGetWidth()/2, ofGetHeight()/2);
     }
     font.drawString("fps: " + ofToString((int)ofGetFrameRate()),ofGetWidth()-150,640);
 
