@@ -13,8 +13,24 @@ void ofApp::setup(){
     vidGrabber1.setup(0);
     vidGrabber2.setup(1);
     
-    camWidth = 1280;  // try to grab at this size.
-    camHeight = 1024;
+    vidGrabber1.setFrameRate(15);
+    vidGrabber2.setFrameRate(15);
+
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // IT'S QUITE IMPORTANT
+    // (at least with FLIR/Point Grey cameras)
+    // to use the NATIVE RESOLUTION
+    // or the camera gets super hot and fps drop to 0 very soon
+
+        camWidth = 1288;
+        camHeight = 964;
+        
+        vidGrabber1.setSize(camWidth, camHeight);
+        vidGrabber2.setSize(camWidth, camHeight);
+    
+    // so, now, we're safe!
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
 
     SyCam1.setName("Cam1");
     SyCam2.setName("Cam2");
