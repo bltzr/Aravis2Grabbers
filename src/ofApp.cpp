@@ -13,11 +13,19 @@ void ofApp::setup(){
     vidGrabber1.setup(0);
     vidGrabber2.setup(1);
     
-    camWidth = 1280;  // try to grab at this size.
-    camHeight = 1024;
+    vidGrabber1.setFrameRate(5);
+    vidGrabber2.setFrameRate(25);
+    
+    camWidth = 1288;  // try to grab at this size.
+    camHeight = 964;
+    camWidth2 = 644;  // try to grab at this size.
+    camHeight2 = 482;
+    
+    vidGrabber1.setSize(camWidth, camHeight);
+    vidGrabber2.setSize(camWidth2, camHeight2);
 
-    SyCam1.setName("Cam1");
-    SyCam2.setName("Cam2");
+    SyCam1.setName("Dessins");
+    SyCam2.setName("Kits");
 
     ofLog() << "width" << ofGetWidth();
     ofLog() << "height" << ofGetHeight();
@@ -29,7 +37,7 @@ void ofApp::setup(){
     ofClear(0,0,0);
     fbo1.end();
 
-    fbo2.allocate(camWidth, camHeight, GL_RGB);
+    fbo2.allocate(camWidth2, camHeight2, GL_RGB);
     fbo2.begin();
     ofClear(0,0,0);
     fbo2.end();
@@ -46,7 +54,7 @@ void ofApp::setup(){
     displayOI = 0;
 
     videoTexture1.allocate(camWidth,camHeight,GL_RGBA);
-    videoTexture2.allocate(camWidth,camHeight,GL_RGBA);
+    videoTexture2.allocate(camWidth2, camHeight2,GL_RGBA);
     ofSetVerticalSync(true);
 }
 
@@ -85,6 +93,22 @@ void ofApp::update(){
         else if(m.getAddress() == "/display"){
             displayOI = m.getArgAsInt32(0);
             ofLog() << "display" << m.getArgAsInt32(0);
+        }
+        else if(m.getAddress() == "/cam1/exposure"){
+            //ofLog() << "zoomX1" << m.getArgAsFloat(0);
+            vidGrabber1.setExposure(m.getArgAsDouble(0));
+        }
+        else if(m.getAddress() == "/cam2/exposure"){
+            //ofLog() << "zoomX1" << m.getArgAsFloat(0);
+            vidGrabber2.setExposure(m.getArgAsDouble(0));
+        }
+        else if(m.getAddress() == "/cam1/fps"){
+            //ofLog() << "zoomX1" << m.getArgAsFloat(0);
+            vidGrabber1.setFrameRate(m.getArgAsInt(0));
+        }
+        else if(m.getAddress() == "/cam2/fps"){
+            //ofLog() << "zoomX1" << m.getArgAsFloat(0);
+            vidGrabber2.setFrameRate(m.getArgAsInt(0));
         }
         else if(m.getAddress() == "/cam1/zoom/x"){
             //ofLog() << "zoomX1" << m.getArgAsFloat(0);
@@ -183,8 +207,8 @@ void ofApp::update(){
         BCSA.setUniform1f("saturation", SA1);
         BCSA.setUniform1f("alpha", 1.);
         BCSA.setUniformTexture("image", videoTexture1,1);
-        videoTexture1.setAnchorPercent(anchorX1,anchorY1);
-        videoTexture1.draw(fbo1.getWidth()/2,fbo1.getHeight()/2,videoTexture1.getWidth()*zoomX1, videoTexture1.getHeight()*zoomY1);
+        //videoTexture1.setAnchorPercent(0,0);
+        videoTexture1.draw(0,0,camWidth,camHeight);
         BCSA.end();
         fbo1.end();
         SyCam1.publishTexture(&fbo1.getTexture());
@@ -204,8 +228,8 @@ void ofApp::update(){
         BCSA.setUniform1f("saturation", SA2);
         BCSA.setUniform1f("alpha", 1.);
         BCSA.setUniformTexture("image", videoTexture2,1);
-        videoTexture2.setAnchorPercent(anchorX2,anchorY2);
-        videoTexture2.draw(fbo2.getWidth()/2,fbo2.getHeight()/2,videoTexture2.getWidth()*zoomX2,videoTexture2.getHeight()*zoomY2);
+        //videoTexture2.setAnchorPercent(0,0);
+        videoTexture2.draw(0,0,camWidth2, camHeight2);
         BCSA.end();
         fbo2.end();
         SyCam2.publishTexture(&fbo2.getTexture());
@@ -217,10 +241,10 @@ void ofApp::update(){
 void ofApp::draw(){
     if (displayOI){
         ofSetHexColor(0xffffff);
-        fbo1.draw(ofGetWidth()/4, 0, ofGetWidth()/2, ofGetHeight()/2);
-        fbo2.draw(ofGetWidth()/4, ofGetWidth()/2, ofGetWidth()/2, ofGetHeight()/2);
+        fbo1.draw(0, 0, ofGetWidth(), ofGetHeight()/2);
+        fbo2.draw(0, ofGetHeight()/2, ofGetWidth(), ofGetHeight()/2);
     }
-    font.drawString("fps: " + ofToString((int)ofGetFrameRate()),ofGetWidth()-150,640);
+    font.drawString("fps: " + ofToString((int)ofGetFrameRate()),ofGetWidth()-150,ofGetHeight()-50);
 
 }
 
