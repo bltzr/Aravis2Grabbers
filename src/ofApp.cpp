@@ -13,13 +13,17 @@ void ofApp::setup(){
     vidGrabber1.setup(0);
     vidGrabber2.setup(1);
     
-    vidGrabber1.setFrameRate(5);
+    vidGrabber1.setFrameRate(10);
     vidGrabber2.setFrameRate(25);
     
     camWidth = 1288;  // try to grab at this size.
     camHeight = 964;
-    camWidth2 = 644;  // try to grab at this size.
+    playheadPos = 322;
+    playheadWidth = 12;
+    camWidth2 = 644;
     camHeight2 = 482;
+    playheadPos2 = 322;
+    playheadWidth2 = 12;
     
     vidGrabber1.setSize(camWidth, camHeight);
     vidGrabber2.setSize(camWidth2, camHeight2);
@@ -93,6 +97,22 @@ void ofApp::update(){
         else if(m.getAddress() == "/display"){
             displayOI = m.getArgAsInt32(0);
             ofLog() << "display" << m.getArgAsInt32(0);
+        }
+        else if(m.getAddress() == "/cam1/playhead/pos"){
+            //ofLog() << "zoomX1" << m.getArgAsFloat(0);
+            playheadPos = m.getArgAsInt(0);
+        }
+        else if(m.getAddress() == "/cam2/playhead/pos"){
+            //ofLog() << "zoomX1" << m.getArgAsFloat(0);
+            playheadPos2 = m.getArgAsInt(0);
+        }
+        else if(m.getAddress() == "/cam1/playhead/width"){
+            //ofLog() << "zoomX1" << m.getArgAsFloat(0);
+            playheadWidth = m.getArgAsInt(0);
+        }
+        else if(m.getAddress() == "/cam2/playhead/width"){
+            //ofLog() << "zoomX1" << m.getArgAsFloat(0);
+            playheadWidth2 = m.getArgAsInt(0);
         }
         else if(m.getAddress() == "/cam1/exposure"){
             //ofLog() << "zoomX1" << m.getArgAsFloat(0);
@@ -208,7 +228,7 @@ void ofApp::update(){
         BCSA.setUniform1f("alpha", 1.);
         BCSA.setUniformTexture("image", videoTexture1,1);
         //videoTexture1.setAnchorPercent(0,0);
-        videoTexture1.draw(0,0,camWidth,camHeight);
+        videoTexture1.draw(playheadPos, 0, playheadWidth, camHeight);
         BCSA.end();
         fbo1.end();
         SyCam1.publishTexture(&fbo1.getTexture());
@@ -229,7 +249,7 @@ void ofApp::update(){
         BCSA.setUniform1f("alpha", 1.);
         BCSA.setUniformTexture("image", videoTexture2,1);
         //videoTexture2.setAnchorPercent(0,0);
-        videoTexture2.draw(0,0,camWidth2, camHeight2);
+        videoTexture2.draw(playheadPos2, 0, playheadWidth2, camHeight2);
         BCSA.end();
         fbo2.end();
         SyCam2.publishTexture(&fbo2.getTexture());
